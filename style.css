@@ -18,6 +18,7 @@ html, body {
   width: 350px;
   position: relative;
   overflow: hidden;
+  opacity: 1;
 }
 .form-structor::after {
   content: "";

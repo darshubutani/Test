@@ -1,0 +1,48 @@
+
+
+
+<script>
+CreateTable("mytable", "container", ["Name", "Email", "Password"]);
+for (let j = 0; j < dataArr.length; j++) {
+	TableAdd([dataArr[j].Name, dataArr[j].Email, dataArr[j].Password]);
+}
+
+function CreateTable(id, where, data) {
+	let table = "<table id='" + id + "'><thead><tr>";
+	for (let i = 0; i < data.length; i++) {
+		table = table + "<th>" + data[i] + "</th>";
+	}
+	table = table + "<td>" + `<a onClick="tableAddto(this)">Add</a>` + "</td>" + "</tr></thead><tbody></tbody></table>";
+	document.getElementById(where).innerHTML += table;
+}
+
+function tableAddto() {
+	console.log("HEllo");
+}
+
+function TableAdd(data) {
+	let raw = "<tr>";
+	for (let i = 0; i < data.length; i++) {
+		raw = raw + "<td>" + data[i] + "</td>";
+	}
+	raw = raw + "<td>" + `<a onClick="onEdit(this)">Edit</a>
+   <a onClick="onDelete(this)">Delete</a>`+ "</td>" + "</tr>";
+	document.getElementsByTagName("tbody")[0].innerHTML += raw;
+}
+
+function onEdit(td) {
+	selectedRow = td.parentElement.parentElement;
+	document.getElementById("Email").value = selectedRow.cells[1].innerHTML;
+	document.getElementById("Password").value = selectedRow.cells[1].innerHTML;
+}
+
+function onDelete(td) {
+	if (confirm('Are you sure to delete this record ?')) {
+		row = td.parentElement.parentElement;
+		let del = document.getElementById("mytable").deleteRow(row.rowIndex);
+		localStorage.removeItem(del);
+		console.log(dataArr);
+	}
+}
+
+</script>
