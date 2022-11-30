@@ -1,147 +1,195 @@
-//Table code
-
-//console.clear();
-
-
-const formLogin = document.getElementById('login');
-const signupBtn = document.querySelector('.submit-btn');
-const btnlogin = document.getElementById('btnLogin');
+'use strict'
+/////
 const InputNameS = document.getElementById('signupName');
 const InputEmailS = document.getElementById('signupEid');
 const InputPswdS = document.getElementById('signupPswd');
+const signupBtn = document.querySelector('.submit-btn');
+const btnlogin = document.getElementById('btnLogin');
 const InputEmailL = document.getElementById('LoginEid');
 const InputPswdL = document.getElementById('LoginPswd');
 const containerApp = document.querySelector('.form-structor');
-const containApp = document.getElementById('container');
- const contApp = document.querySelector('.form-structor .signup');
- const cApp = document.querySelector('.form-structor .signup.slide-up');
- containApp.style.opacity = 0;
+const containerLogin = document.querySelector('.center');
+const containerSignup = document.querySelector('.signup');
+const appContainer = document.querySelector('.app');
+appContainer.style.opacity = 0;
+containerLogin.style.opacity = 0;
+////
+
+let form = document.getElementById("form");
+let nameInput = document.getElementById("nameInput");
+let emailInput = document.getElementById("emailInput");
+let pswdInput = document.getElementById("pswdInput");
+let msg = document.getElementById("msg");
+let tasks = document.getElementById("tasks");
+let add = document.getElementById("add");
+let btnlogout = document.getElementById("logout");
+let btnLogin2 = document.getElementById("btnLogin2");
+//let login;
+let data = [{}];
 
 
-let dataArr = JSON.parse((localStorage.getItem("Datas"))) ? JSON.parse((localStorage.getItem("Datas"))) : [];
-console.log(dataArr);
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  formValidation();
+});
 
-let dataBase = {
-	Name: null,
-	Email: null,
-	Password: null,
+let formValidation = () => {
+  if (nameInput.value === "") {
+    console.log("failure");
+    msg.innerHTML = "Task cannot be blank";
+  } else {
+    console.log("success");
+    msg.innerHTML = "";
+    acceptData();
+    add.setAttribute("data-bs-dismiss", "modal");
+    add.click();
+
+    (() => {
+      add.setAttribute("data-bs-dismiss", "");
+    })();
+  }
 };
 
-//Table data
 
-CreateTable("mytable", "container", ["Name", "Email", "Password"]);
-for (let j = 0; j < dataArr.length; j++) {
-	TableAdd([dataArr[j].Name, dataArr[j].Email, dataArr[j].Password]);
-}
+let acceptData = () => {
+  data.push({
+    names: nameInput.value || InputNameS.value,
+    email: emailInput.value || InputEmailS.value,
+    password: pswdInput.value || InputPswdS.value,
+  });
 
-function CreateTable(id, where, data) {
-	let table = "<table id='" + id + "'><thead><tr>";
-	for (let i = 0; i < data.length; i++) {
-		table = table + "<th>" + data[i] + "</th>";
-	}
-	table = table + "<td>" + `<a onClick="tableAddto(this)">Add</a>` + "</td>" + "</tr></thead><tbody></tbody></table>";
-	document.getElementById(where).innerHTML += table;
-}
+  localStorage.setItem("data", JSON.stringify(data));
+  console.log(data);
+  createTasks();
+};
 
-function tableAddto() {
-	console.log("HEllo");
-	containerApp.style.opacity =100;
-}
+let createTasks = () => {
+  tasks.innerHTML = "";
+  data.map((x, index) => {
+    return (tasks.innerHTML += `
+    <div id=${index}>
+          <span class="fw-bold">${x.names}</span>
+          <span class="small text-secondary">${x.email}</span>
+          <p>${x.password}</p>
+  
+          <span class="options">
+            <i onClick= "editTask(this)" data-bs-toggle="modal" data-bs-target="#form" class="fas fa-edit"></i>
+            <i onClick ="deleteTask(this);createTasks()" class="fas fa-trash-alt"></i>
+          </span>
+        </div>
+    `);
+  });
 
-function TableAdd(data) {
-	let raw = "<tr>";
-	for (let i = 0; i < data.length; i++) {
-		raw = raw + "<td>" + data[i] + "</td>";
-	}
-	raw = raw + "<td>" + `<a onClick="onEdit(this)">Edit</a>
-   <a onClick="onDelete(this)">Delete</a>`+ "</td>" + "</tr>";
-	document.getElementsByTagName("tbody")[0].innerHTML += raw;	
-}
+  resetForm();
+};
 
-function onEdit(td) {
-	selectedRow = td.parentElement.parentElement;
-	dataBase.Name = InputNameS.value;
-	dataBase.Email = InputEmailS.value;
-	dataBase.Password = InputPswdS.value;
-	// document.getElementById("Email").value = selectedRow.cells[1].innerHTML;
-	// document.getElementById("Password").value = selectedRow.cells[1].innerHTML;
-}
+let deleteTask = (e) => {
+  confirm('Are you sure to delete this record ?')
+  //e.parentElement.parentElement.remove();
+  data.splice(e.parentElement.parentElement.id, 1);
+  localStorage.setItem("data", JSON.stringify(data));
+  console.log(data);
 
-function onDelete(td) {
-	if (confirm('Are you sure to delete this record ?')) {
-		row = td.parentElement.parentElement;
-		let id = td;
-		let arr = JSON.parse(localStorage.getItem("Datas"));
-		console.log(arr);
-		document.getElementById("mytable").deleteRow(row.rowIndex);
-		dataArr.splice(id,1);
-		localStorage.setItem("Datas",JSON.stringify(dataArr));
-		console.log(dataArr);
-	}
-}
+};
 
+let editTask = (e) => {
+
+  let selectedTask = e.parentElement.parentElement;
+  nameInput.value = selectedTask.children[0].innerHTML;
+  emailInput.value = selectedTask.children[1].innerHTML;
+  pswdInput.value = selectedTask.children[2].innerHTML;
+  window.confirm = function () { return false; };
+  deleteTask(e);
+};
+
+let resetForm = () => {
+  nameInput.value = "";
+  emailInput.value = "";
+  pswdInput.value = "";
+  InputNameS.value = "";
+  InputEmailS.value = "";
+  InputPswdS.value= "";
+  InputPswdL.value ="";
+  InputEmailL.value = "";
+};
+//IIFE to display data 
+(() => {
+  data = JSON.parse(localStorage.getItem("data")) || []
+  console.log(data);
+   
+  if(localStorage.login == 1){
+    console.log('already Logged in ');
+      containerApp.style.opacity = 0;
+      containerSignup.style.opacity = 0;
+      containerLogin.style.opacity = 0;
+      appContainer.style.opacity = 100;
+  }
+  else{
+          console.log("Login first");
+  }
+
+
+  createTasks();
+})();
+
+
+//////
 signupBtn.addEventListener('click', (e) => {
-	e.preventDefault();
+  e.preventDefault();
+  console.log("Hello signup");
+  localStorage.login = 1;
+  containerApp.style.opacity = 0;
+  appContainer.style.opacity = 100;
+  containerSignup.style.opacity = 0;
 
-	console.log("Hello signup");
-	dataBase.Name = InputNameS.value;
-	dataBase.Email = InputEmailS.value;
-	dataBase.Password = InputPswdS.value;
-	console.log(dataBase);
-
-	dataArr.push(dataBase);
-
-	console.log(InputNameS.value, InputEmailS.value, InputPswdS.value);
-
-	//console.log(dataBase);
-
-	localStorage.setItem("Datas", JSON.stringify(dataArr));
-
-	let parent = e.target.parentNode;
-	Array.from(e.target.parentNode.classList).find((element) => {
-		if (element !== "slide-up") {
-			parent.classList.add('slide-up')
-		} else {
-			loginBtn.parentNode.parentNode.classList.add('slide-up')
-			parent.classList.remove('slide-up')
-		}
-	});
+  acceptData();
 });
 
-let currentAccount;
-
+let temp;
 btnlogin.addEventListener('click', function (e) {
-	e.preventDefault();
+  e.preventDefault();
 
-	currentAccount = dataArr.find(acc => acc.Email === InputEmailL.value);
+  console.log(localStorage.login);
 
-	if ((currentAccount.Password) === (InputPswdL.value)) {
-		console.log('LogIN');
-	};
-	console.log("Inside login");
-	containerApp.style.opacity = 0;
-	containApp.style.opacity = 100;
-	console.log(dataArr);
-
-
+  if (data.find(acc => acc.email === InputEmailL.value)) {
+    temp = data.find(acc => acc.email === InputEmailL.value);
+    console.log(temp);
+    if ((temp.password) === (InputPswdL.value)) {
+      console.log('LogIN');
+      localStorage.login = 1;
+      containerApp.style.opacity = 0;
+      containerSignup.style.opacity = 0;
+      containerLogin.style.opacity = 0;
+      appContainer.style.opacity = 100;
+    }
+    else {
+      alert("Incorrect password")
+    }
+  }
+  else {
+    alert("Account not found");
+  }
 });
 
-formLogin.addEventListener('click', (e) => {
-	e.preventDefault();
-
-	console.log("Hello login page");
-
-	let parent = e.target.parentNode.parentNode;
-	Array.from(e.target.parentNode.parentNode.classList).find((element) => {
-		if (element !== "slide-up") {
-			parent.classList.add('slide-up')
-		} else {
-			signupBtn.parentNode.classList.add('slide-up')
-			parent.classList.remove('slide-up')
-		}
-	});
+btnlogout.addEventListener('click',function(e){
+  e.preventDefault();
+     localStorage.login = 0;
+     containerApp.style.opacity = 100;
+     appContainer.style.opacity = 0;
+     containerLogin.style.opacity = 0;
+     containerSignup.style.opacity = 100;
+     InputNameS.value = "";
+     InputEmailS.value = "";
+     InputPswdS.value= "";
+     InputPswdL.value ="";
+     InputEmailL.value = "";
 });
 
-
-
-
+btnLogin2.addEventListener('click',function(e){
+  e.preventDefault();
+  containerApp.style.opacity = 100;
+  appContainer.style.opacity = 0;
+  containerLogin.style.opacity = 100;
+  containerSignup.style.opacity = 0;
+});
+/////
