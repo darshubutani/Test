@@ -1,3 +1,20 @@
+/////
+const InputNameS = document.getElementById('signupName');
+const InputEmailS = document.getElementById('signupEid');
+const InputPswdS = document.getElementById('signupPswd');
+const signupBtn = document.querySelector('.submit-btn');
+const btnlogin = document.getElementById('btnLogin');
+const InputEmailL = document.getElementById('LoginEid');
+const InputPswdL = document.getElementById('LoginPswd');
+const containerApp = document.querySelector('.form-structor');
+const containerLogin = document.querySelector('.center');
+const containerSignup = document.querySelector('.signup');
+const appContainer = document.querySelector('.app');
+//appContainer.style.opacity = 0;
+//containerLogin.style.opacity = 0;
+////
+
+
 let form = document.getElementById("form");
 let nameInput = document.getElementById("nameInput");
 let emailInput = document.getElementById("emailInput");
@@ -5,9 +22,7 @@ let pswdInput = document.getElementById("pswdInput");
 let msg = document.getElementById("msg");
 let tasks = document.getElementById("tasks");
 let add = document.getElementById("add");
-
-let database = [{}];
-
+//let update = document.getElementById("update");
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -31,119 +46,156 @@ let formValidation = () => {
   }
 };
 
-
 let acceptData = () => {
-  // data.push({
-  //   names: nameInput.value || InputNameS.value,
-  //   email: emailInput.value || InputEmailS.value,
-  //   password: pswdInput.value || InputPswdS.value,
-  // });
 
-  // localStorage.setItem("data", JSON.stringify(data));
-  // console.log(data);
-
-
-  //Read / Fetch data
-
-// fetch('https://crudcrud.com/api/15abf07de1d840a4ab0696ac75a1c342/database')
-// .then(response => response.json())
-// .then(data => console.log(data))
-
-
-  createTasks();
+  //Add data api
+  fetch('https://crudcrud.com/api/487b692dac6a4447a5c5e9fb6e98dbc4/data', {
+    headers: { "Content-Type": "application/json; charset=utf-8" },
+    method: 'POST',
+    body: JSON.stringify({
+      name: nameInput.value || InputNameS.value,
+      Email: emailInput.value || InputEmailS.value,
+      password: pswdInput.value || InputPswdS.value,
+    })
+  })
+    .then(response => response.json())
+    .then(data => console.log(data))
+  resetForm();
 };
 
-let createTasks = () => {
-  tasks.innerHTML = "";
-  database.map((x, index) => {
+let createTasks = (data) => {
+
+  console.log(data);
+  data.map((x, index) => {
     return (tasks.innerHTML += `
-    <div id=${index}>
-          <span class="fw-bold">${x.names}</span>
-          <span class="small text-secondary">${x.email}</span>
-          <p>${x.password}</p>
-  
-          <span class="options">
-            <i onClick= "editTask(this)" data-bs-toggle="modal" data-bs-target="#form" class="fas fa-edit"></i>
-            <i onClick ="deleteTask(this);createTasks()" class="fas fa-trash-alt"></i>
-          </span>
-        </div>
-    `);
+  <div id=${index}>
+        
+        <p>${x.name}</p>
+        <p>${x.Email}</p>
+        <p>${x.password}</p>
+        <p>${x._id}</p>
 
-//Add data api
-
-// fetch('https://crudcrud.com/api/15abf07de1d840a4ab0696ac75a1c342/database', {
-//   headers: { "Content-Type": "application/json; charset=utf-8" },
-//   method: 'POST',
-//   body: JSON.stringify({
-//     name: 'mno',
-//     Email: 'mno@123',
-//       password:123,
-//   })
-// })
-// .then(response => response.json())
-// .then(data => console.log(data))
-
-
+        <span class="options">
+          <i onClick= "editTask(this,'${x._id}')" data-bs-toggle="modal" data-bs-target="#form" class="fas fa-edit"></i>
+          <i onClick ="deleteTask(this,'${x._id}');" class="fas fa-trash-alt"></i>
+        </span>
+      </div>
+  `);
   });
 
   resetForm();
 };
 
-let deleteTask = (e) => {
+
+let deleteTask = (e, id) => {
+
   confirm('Are you sure to delete this record ?')
-  //e.parentElement.parentElement.remove();
-  database.splice(e.parentElement.parentElement.id, 1);
-  // localStorage.setItem("data", JSON.stringify(data));
-  // console.log(database);
+  e.parentElement.parentElement.remove();
 
-//delete opration
-//fetch(
-  // 'https://crudcrud.com/api/15abf07de1d840a4ab0696ac75a1c342/database/638749f1aaf0eb03e8f91b83', {
-  //   method: 'DELETE'
-  // })
-  // .then(response => console.log(response))
-
-
-
+  fetch(`https://crudcrud.com/api/487b692dac6a4447a5c5e9fb6e98dbc4/data/${id}`,
+    {
+      method: 'DELETE'
+    })
+    .then(response => console.log(response))
 };
 
-let editTask = (e) => {
+let editTask = (e, id) => {
 
-  // let selectedTask = e.parentElement.parentElement;
-  // nameInput.value = selectedTask.children[0].innerHTML;
-  // emailInput.value = selectedTask.children[1].innerHTML;
-  // pswdInput.value = selectedTask.children[2].innerHTML;
-  // window.confirm = function () { return false; };
+  let selectedTask = e.parentElement.parentElement;
+  nameInput.value = selectedTask.children[0].innerHTML;
+  emailInput.value = selectedTask.children[1].innerHTML;
+  pswdInput.value = selectedTask.children[2].innerHTML;
+  window.confirm = function () { return false; };
 
 
-  //Update database using unique id  
+  // Update database using unique id  
   // fetch(
-  //   'https://crudcrud.com/api/15abf07de1d840a4ab0696ac75a1c342/database/638749f1aaf0eb03e8f91b83', {
+  //   `https://crudcrud.com/api/487b692dac6a4447a5c5e9fb6e98dbc4/data/${id}`, {
   //     headers: { "Content-Type": "application/json; charset=utf-8" },
   //     method: 'PUT',
   //     body: JSON.stringify({
-  //       name: 'updated',
-  //       Email: 'mno@123',
-  //       password:123,
-       
+  //       name: nameInput.value,
+  //       Email: emailInput.value,
+  //       password:pswdInput.value,
   //     })
   //   })
   //   .then(response => console.log(response))
 
-  deleteTask(e);
+  deleteTask(e, id);
 };
 
 let resetForm = () => {
   nameInput.value = "";
   emailInput.value = "";
   pswdInput.value = "";
- 
+  InputNameS.value = "";
+  InputEmailS.value = "";
+  InputPswdS.value= "";
+  InputPswdL.value ="";
+  InputEmailL.value = "";
 };
+
 //IIFE to display data 
 (() => {
-  // data = JSON.parse(localStorage.getItem("data")) || []
-  // console.log(data);
-   
 
-  createTasks();
+  database = fetch('https://crudcrud.com/api/487b692dac6a4447a5c5e9fb6e98dbc4/data')
+    .then(response => response.json())
+    .then(data => createTasks(data));
+
 })();
+
+
+/////////////////////////
+signupBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  console.log("Hello signup");
+  // localStorage.login = 1;
+  // containerApp.style.opacity = 0;
+  // appContainer.style.opacity = 100;
+  // containerSignup.style.opacity = 0;
+
+  acceptData();
+});
+
+let temp;
+btnlogin.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  (() => {
+
+      fetch('https://crudcrud.com/api/487b692dac6a4447a5c5e9fb6e98dbc4/data')
+      .then(response => response.json())
+      .then(data => loginData(data));
+  
+  })();
+
+  let loginData = (data) => {
+    console.log(data);
+    data.map((x) => {
+    if (x.Email == InputEmailL.value && x.password == InputPswdL.value){
+      console.log("Login working");
+    }
+    })
+  }
+
+  // //console.log(localStorage.login);
+
+  // if (data.find(acc => acc.email === InputEmailL.value)) {
+  //   temp = data.find(acc => acc.email === InputEmailL.value);
+  //   console.log(temp);
+  //   if ((temp.password) === (InputPswdL.value)) {
+  //     // console.log('LogIN');
+  //     // localStorage.login = 1;
+  //     // containerApp.style.opacity = 0;
+  //     // containerSignup.style.opacity = 0;
+  //     // containerLogin.style.opacity = 0;
+  //     // appContainer.style.opacity = 100;
+  //   }
+  //   else {
+  //     alert("Incorrect password")
+  //   }
+  // }
+  // else {
+  //   alert("Account not found");
+  // }
+});
