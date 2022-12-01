@@ -1,3 +1,20 @@
+/////
+const InputNameS = document.getElementById('signupName');
+const InputEmailS = document.getElementById('signupEid');
+const InputPswdS = document.getElementById('signupPswd');
+const signupBtn = document.querySelector('.submit-btn');
+const btnlogin = document.getElementById('btnLogin');
+const InputEmailL = document.getElementById('LoginEid');
+const InputPswdL = document.getElementById('LoginPswd');
+const containerApp = document.querySelector('.form-structor');
+const containerLogin = document.querySelector('.center');
+const containerSignup = document.querySelector('.signup');
+const appContainer = document.querySelector('.app');
+//appContainer.style.opacity = 0;
+//containerLogin.style.opacity = 0;
+////
+
+
 let form = document.getElementById("form");
 let nameInput = document.getElementById("nameInput");
 let emailInput = document.getElementById("emailInput");
@@ -5,7 +22,7 @@ let pswdInput = document.getElementById("pswdInput");
 let msg = document.getElementById("msg");
 let tasks = document.getElementById("tasks");
 let add = document.getElementById("add");
-let update = document.getElementById("update");
+//let update = document.getElementById("update");
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -36,9 +53,9 @@ let acceptData = () => {
     headers: { "Content-Type": "application/json; charset=utf-8" },
     method: 'POST',
     body: JSON.stringify({
-      name: nameInput.value,
-      Email: emailInput.value,
-      password: pswdInput.value,
+      name: nameInput.value || InputNameS.value,
+      Email: emailInput.value || InputEmailS.value,
+      password: pswdInput.value || InputPswdS.value,
     })
   })
     .then(response => response.json())
@@ -111,6 +128,11 @@ let resetForm = () => {
   nameInput.value = "";
   emailInput.value = "";
   pswdInput.value = "";
+  InputNameS.value = "";
+  InputEmailS.value = "";
+  InputPswdS.value= "";
+  InputPswdL.value ="";
+  InputEmailL.value = "";
 };
 
 //IIFE to display data 
@@ -121,3 +143,59 @@ let resetForm = () => {
     .then(data => createTasks(data));
 
 })();
+
+
+/////////////////////////
+signupBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  console.log("Hello signup");
+  // localStorage.login = 1;
+  // containerApp.style.opacity = 0;
+  // appContainer.style.opacity = 100;
+  // containerSignup.style.opacity = 0;
+
+  acceptData();
+});
+
+let temp;
+btnlogin.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  (() => {
+
+      fetch('https://crudcrud.com/api/487b692dac6a4447a5c5e9fb6e98dbc4/data')
+      .then(response => response.json())
+      .then(data => loginData(data));
+  
+  })();
+
+  let loginData = (data) => {
+    console.log(data);
+    data.map((x) => {
+    if (x.Email == InputEmailL.value && x.password == InputPswdL.value){
+      console.log("Login working");
+    }
+    })
+  }
+
+  // //console.log(localStorage.login);
+
+  // if (data.find(acc => acc.email === InputEmailL.value)) {
+  //   temp = data.find(acc => acc.email === InputEmailL.value);
+  //   console.log(temp);
+  //   if ((temp.password) === (InputPswdL.value)) {
+  //     // console.log('LogIN');
+  //     // localStorage.login = 1;
+  //     // containerApp.style.opacity = 0;
+  //     // containerSignup.style.opacity = 0;
+  //     // containerLogin.style.opacity = 0;
+  //     // appContainer.style.opacity = 100;
+  //   }
+  //   else {
+  //     alert("Incorrect password")
+  //   }
+  // }
+  // else {
+  //   alert("Account not found");
+  // }
+});
