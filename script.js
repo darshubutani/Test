@@ -10,8 +10,10 @@ const containerApp = document.querySelector('.form-structor');
 const containerLogin = document.querySelector('.center');
 const containerSignup = document.querySelector('.signup');
 const appContainer = document.querySelector('.app');
-//appContainer.style.opacity = 0;
-//containerLogin.style.opacity = 0;
+let btnlogout = document.getElementById("logout");
+let btnLogin2 = document.getElementById("btnLogin2");
+appContainer.style.opacity = 0;
+containerLogin.style.opacity = 0;
 ////
 
 
@@ -49,7 +51,7 @@ let formValidation = () => {
 let acceptData = () => {
 
   //Add data api
-  fetch('https://crudcrud.com/api/487b692dac6a4447a5c5e9fb6e98dbc4/data', {
+  fetch('https://crudcrud.com/api/d3060bcc73ac48e4a5e3d82f760e8bfb/data', {
     headers: { "Content-Type": "application/json; charset=utf-8" },
     method: 'POST',
     body: JSON.stringify({
@@ -92,7 +94,7 @@ let deleteTask = (e, id) => {
   confirm('Are you sure to delete this record ?')
   e.parentElement.parentElement.remove();
 
-  fetch(`https://crudcrud.com/api/487b692dac6a4447a5c5e9fb6e98dbc4/data/${id}`,
+  fetch(`https://crudcrud.com/api/d3060bcc73ac48e4a5e3d82f760e8bfb/data/${id}`,
     {
       method: 'DELETE'
     })
@@ -130,15 +132,27 @@ let resetForm = () => {
   pswdInput.value = "";
   InputNameS.value = "";
   InputEmailS.value = "";
-  InputPswdS.value= "";
-  InputPswdL.value ="";
+  InputPswdS.value = "";
+  InputPswdL.value = "";
   InputEmailL.value = "";
 };
 
 //IIFE to display data 
 (() => {
 
-  database = fetch('https://crudcrud.com/api/487b692dac6a4447a5c5e9fb6e98dbc4/data')
+
+  if (localStorage.login == 1) {
+    console.log('already Logged in ');
+    containerApp.style.opacity = 0;
+    containerSignup.style.opacity = 0;
+    containerLogin.style.opacity = 0;
+    appContainer.style.opacity = 100;
+  }
+  else {
+    console.log("Login first");
+  }
+
+  database = fetch('https://crudcrud.com/api/d3060bcc73ac48e4a5e3d82f760e8bfb/data')
     .then(response => response.json())
     .then(data => createTasks(data));
 
@@ -149,10 +163,10 @@ let resetForm = () => {
 signupBtn.addEventListener('click', (e) => {
   e.preventDefault();
   console.log("Hello signup");
-  // localStorage.login = 1;
-  // containerApp.style.opacity = 0;
-  // appContainer.style.opacity = 100;
-  // containerSignup.style.opacity = 0;
+  localStorage.login = 1;
+  containerApp.style.opacity = 0;
+  appContainer.style.opacity = 100;
+  containerSignup.style.opacity = 0;
 
   acceptData();
 });
@@ -163,39 +177,58 @@ btnlogin.addEventListener('click', function (e) {
 
   (() => {
 
-      fetch('https://crudcrud.com/api/487b692dac6a4447a5c5e9fb6e98dbc4/data')
+
+    fetch('https://crudcrud.com/api/d3060bcc73ac48e4a5e3d82f760e8bfb/data')
       .then(response => response.json())
       .then(data => loginData(data));
-  
+
   })();
 
   let loginData = (data) => {
     console.log(data);
-    data.map((x) => {
-    if (x.Email == InputEmailL.value && x.password == InputPswdL.value){
-      console.log("Login working");
+
+    temp = data.find(o => o.Email == InputEmailL.value);
+    console.log(temp);
+    if (data.find(o => o.Email == InputEmailL.value)) {
+      if ((temp.password) === (InputPswdL.value)) {
+        console.log('LogIN');
+        localStorage.login = 1;
+        containerApp.style.opacity = 0;
+        containerSignup.style.opacity = 0;
+        containerLogin.style.opacity = 0;
+        appContainer.style.opacity = 100;
+      }
+      else {
+        alert("Incorrect password")
+      }
     }
-    })
+    else {
+      alert("Account not found");
+    }
+
   }
 
-  // //console.log(localStorage.login);
+});
 
-  // if (data.find(acc => acc.email === InputEmailL.value)) {
-  //   temp = data.find(acc => acc.email === InputEmailL.value);
-  //   console.log(temp);
-  //   if ((temp.password) === (InputPswdL.value)) {
-  //     // console.log('LogIN');
-  //     // localStorage.login = 1;
-  //     // containerApp.style.opacity = 0;
-  //     // containerSignup.style.opacity = 0;
-  //     // containerLogin.style.opacity = 0;
-  //     // appContainer.style.opacity = 100;
-  //   }
-  //   else {
-  //     alert("Incorrect password")
-  //   }
-  // }
-  // else {
-  //   alert("Account not found");
-  // }
+
+btnlogout.addEventListener('click', function (e) {
+  e.preventDefault();
+  localStorage.login = 0;
+  containerApp.style.opacity = 100;
+  appContainer.style.opacity = 0;
+  containerLogin.style.opacity = 0;
+  containerSignup.style.opacity = 100;
+  InputNameS.value = "";
+  InputEmailS.value = "";
+  InputPswdS.value = "";
+  InputPswdL.value = "";
+  InputEmailL.value = "";
+});
+
+btnLogin2.addEventListener('click', function (e) {
+  e.preventDefault();
+  containerApp.style.opacity = 100;
+  appContainer.style.opacity = 0;
+  containerLogin.style.opacity = 100;
+  containerSignup.style.opacity = 0;
 });
